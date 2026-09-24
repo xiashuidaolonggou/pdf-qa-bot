@@ -28,11 +28,11 @@ GEMINI_MODEL = _get_secret("GEMINI_MODEL", "gemini-3.6-flash")
 EMBEDDING_MODEL = _get_secret("EMBEDDING_MODEL", "models/gemini-embedding-2")
 
 # ===== 文本切分配置 =====
-CHUNK_SIZE = int(_get_secret("CHUNK_SIZE", "500"))
-CHUNK_OVERLAP = int(_get_secret("CHUNK_OVERLAP", "50"))
+CHUNK_SIZE = int(_get_secret("CHUNK_SIZE", "1000"))
+CHUNK_OVERLAP = int(_get_secret("CHUNK_OVERLAP", "200"))
 
 # ===== 检索配置 =====
-TOP_K = int(_get_secret("TOP_K", "4"))
+TOP_K = int(_get_secret("TOP_K", "6"))
 
 # ===== 路径配置 =====
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
