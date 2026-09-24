@@ -109,7 +109,16 @@ with st.sidebar:
 
     st.divider()
 
-    # 文档管理
+    # 调试模式开关
+    if "debug_mode" not in st.session_state:
+        st.session_state.debug_mode = False
+    st.session_state.debug_mode = st.checkbox(
+        "🔍 调试模式（显示检索到的原始片段）" if st.session_state.lang == "zh" else "🔍 Debug mode (show retrieved chunks)",
+        value=st.session_state.debug_mode,
+    )
+
+    st.divider()
+
     st.header(L["sidebar_header"])
 
     uploaded_files = st.file_uploader(
@@ -196,14 +205,27 @@ if prompt := st.chat_input(L["chat_placeholder"]):
                 try:
                     result = rag_engine.ask_question(prompt, st.session_state.vectorstore)
                     answer = result["answer"]
-                    sources = [doc.page_content for doc in result["source_documents"]]
+                    source_docs = result["source_documents"]
+                    sources = [doc.page_content for doc in source_docs]
+
                     st.markdown(answer)
-                    if sources:
+
+                    # 调试模式：显示原始检索片段
+                    if st.session_state.get("debug_mode"):
+                        with st.expander("🔍 调试：检索到的原始片段" if st.session_state.lang == "zh" else "🔍 Debug: Retrieved chunks", expanded=True):
+                            st.caption(f"共检索到 {len(source_docs)} 个片段（TOP_K={rag_engine.config.TOP_K}，CHUNK_SIZE={rag_engine.config.CHUNK_SIZE}）")
+                            for i, doc in enumerate(source_docs, 1):
+                                src = doc.metadata.get("source", "未知来源")
+                                page = doc.metadata.get("page", "?")
+                                st.markdown(f"**片段 {i}** | 来源: `{src}` | 页码: {page} | 长度: {len(doc.page_content)} 字符")
+                                st.code(doc.page_content, language=None)
+                    elif sources:
                         with st.expander(L["sources_label"]):
                             for i, source in enumerate(sources, 1):
                                 st.markdown(f"**{L['source_chunk'].format(i=i)}**")
                                 st.markdown(f"> {source}")
                                 st.divider()
+
                     st.session_state.chat_history.append({
                         "role": "assistant",
                         "content": answer,
@@ -211,3 +233,4 @@ if prompt := st.chat_input(L["chat_placeholder"]):
                     })
                 except Exception as e:
                     st.error(L["answer_fail"].format(e=str(e)))
+

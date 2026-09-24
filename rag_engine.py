@@ -18,26 +18,52 @@ import config
 
 
 # ===== 1. 文档加载 =====
+import re
+
+def _clean_text(text: str) -> str:
+    """
+    清理文档提取的文本：
+    - 去除图片/对象占位符（\ufffc，Word 中图片的 Unicode 占位符）
+    - 合并多余空白行
+    """
+    # 去掉 Word 图片占位符 U+FFFC
+    text = text.replace("\ufffc", "")
+    # 去掉 PDF 中常见的无意义乱码字符（连续多个问号、方块等）
+    text = re.sub(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]", "", text)
+    # 合并连续 3 个以上空行为 2 个
+    text = re.sub(r"\n{3,}", "\n\n", text)
+    return text.strip()
+
+
 def load_document(file_path: str) -> List[Document]:
     """
-    根据文件扩展名自动选择合适的 Loader 加载文档
-    
+    根据文件扩展名自动选择合适的 Loader 加载文档，并清理文本
+
     参数:
         file_path: 文件路径
     返回:
         Document 列表，每个 Document 包含 page_content 和 metadata
     """
     ext = os.path.splitext(file_path)[1].lower()
-    
+
     if ext == ".pdf":
         loader = PyPDFLoader(file_path)
     elif ext == ".docx":
         loader = Docx2txtLoader(file_path)
     else:
         raise ValueError(f"不支持的文件格式: {ext}，目前支持 .pdf 和 .docx")
-    
+
     documents = loader.load()
+
+    # 清理每个 Document 的文本内容
+    for doc in documents:
+        doc.page_content = _clean_text(doc.page_content)
+
+    # 过滤掉清理后内容为空的页
+    documents = [doc for doc in documents if len(doc.page_content.strip()) > 10]
+
     return documents
+
 
 
 # ===== 2. 文本切分 =====
@@ -121,34 +147,40 @@ def get_qa_chain(vectorstore: Chroma):
         model=config.GEMINI_MODEL,
         google_api_key=config.GEMINI_API_KEY,
     )
-    
-    # 构建 Prompt 模板
+
+    # 构建 Prompt 模板（改进版：明确要求综合所有片段作答）
     prompt = ChatPromptTemplate.from_messages([
-        ("system", """你是一个专业的文档问答助手。请根据以下参考文档内容回答用户的问题。
+        ("system", """你是一个专业的文档问答助手。以下是从文档中检索到的多个相关片段，请综合所有片段的内容来回答用户的问题。
 
-规则：
-1. 只根据提供的文档内容回答，不要编造信息
-2. 如果文档中没有相关信息，请诚实说明
-3. 回答要简洁、准确、有条理
-4. 如果合适，使用列表或分点来组织回答
+重要规则：
+1. 请仔细阅读【所有】参考片段，即使某个片段只包含章节标题，其相邻片段可能包含答案
+2. 综合多个片段的信息给出完整回答，不要因为单个片段内容不完整就说"文档中没有相关信息"
+3. 只根据提供的文档内容回答，不要编造文档中没有的信息
+4. 回答要简洁、准确、有条理，如果合适请用列表或分点组织
+5. 如果所有片段都确实不含相关信息，再诚实说明
 
-参考文档：
+参考文档片段：
 {context}"""),
         ("human", "{input}"),
     ])
-    
+
     # 创建文档问答链
     document_chain = create_stuff_documents_chain(llm, prompt)
-    
-    # 创建检索器
+
+    # 使用 MMR（最大边际相关性）检索，确保检索结果多样性，
+    # 避免返回内容高度重复的 chunk，同时覆盖标题和正文
     retriever = vectorstore.as_retriever(
-        search_type="similarity",
-        search_kwargs={"k": config.TOP_K},
+        search_type="mmr",
+        search_kwargs={
+            "k": config.TOP_K,
+            "fetch_k": config.TOP_K * 3,  # 先取更多候选，再从中挑多样的
+            "lambda_mult": 0.7,           # 0=最大多样性，1=纯相似度，0.7取平衡
+        },
     )
-    
+
     # 组合成完整的 RAG 链
     retrieval_chain = create_retrieval_chain(retriever, document_chain)
-    
+
     return retrieval_chain
 
 
