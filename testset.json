@@ -1,0 +1,131 @@
+[
+  {
+    "id": "q01",
+    "type": "answerable",
+    "question": "这个系统支持上传哪几种格式的文档？",
+    "key_phrase": "支持上传 PDF 和 Word",
+    "note": "手册 1.2 / 3.1：PDF 与 Word(.docx)"
+  },
+  {
+    "id": "q02",
+    "type": "answerable",
+    "question": "知识库的向量数据保存在本地哪个目录？",
+    "key_phrase": "vectorstore 目录",
+    "note": "手册 3.3：本地 vectorstore 目录"
+  },
+  {
+    "id": "q03",
+    "type": "answerable",
+    "question": "清空知识库以后还能恢复吗？",
+    "key_phrase": "不可恢复",
+    "note": "手册 4.4 / 7：清空不可恢复"
+  },
+  {
+    "id": "q04",
+    "type": "answerable",
+    "question": "如果上传的 PDF 是扫描件、里面只有图片，系统能提取文字吗？该怎么办？",
+    "key_phrase": "OCR",
+    "note": "手册 6.1：扫描件需先做 OCR"
+  },
+  {
+    "id": "q05",
+    "type": "answerable",
+    "question": "同一份文档重复上传会有什么后果？",
+    "key_phrase": "重复入库",
+    "note": "手册 6.3"
+  },
+  {
+    "id": "q06",
+    "type": "answerable",
+    "question": "回答不准的时候，可以调哪个参数让参考片段变多？",
+    "key_phrase": "TOP_K",
+    "note": "手册 6.2：调大 TOP_K"
+  },
+  {
+    "id": "q07",
+    "type": "answerable",
+    "question": "换了新的 API Key 之后要怎么做才生效？",
+    "key_phrase": "重启系统",
+    "note": "手册 6.4 / 4.1"
+  },
+  {
+    "id": "q08",
+    "type": "answerable",
+    "question": "系统在离线环境下能正常使用吗？",
+    "key_phrase": "离线环境无法使用",
+    "note": "手册 7：依赖 Google API 在线服务"
+  },
+  {
+    "id": "q09",
+    "type": "answerable",
+    "question": "系统支持 txt 或 Excel 文件吗？",
+    "key_phrase": "不支持",
+    "note": "手册 7：不支持 .txt/.doc/Excel"
+  },
+  {
+    "id": "q10",
+    "type": "answerable",
+    "question": "文本切分用的是什么切分方式？",
+    "key_phrase": "递归字符切分器",
+    "note": "手册 5.2"
+  },
+  {
+    "id": "q11",
+    "type": "answerable",
+    "question": "检索环节是按什么方式找相关内容的？",
+    "key_phrase": "向量相似度",
+    "note": "手册 5.2：检索采用向量相似度"
+  },
+  {
+    "id": "q12",
+    "type": "answerable",
+    "question": "一次能上传多少个文件？有数量限制吗？",
+    "key_phrase": "硬性限制",
+    "note": "手册 7：单次上传数量无硬性限制"
+  },
+  {
+    "id": "q13",
+    "type": "answerable",
+    "question": "文档处理完成后，页面会提示什么信息？",
+    "key_phrase": "文本块总数",
+    "note": "手册 3.1"
+  },
+  {
+    "id": "q14",
+    "type": "answerable",
+    "question": "怎么核对一次回答是不是有依据？",
+    "key_phrase": "参考片段",
+    "note": "手册 1.2 / 3.2：回答展示参考片段可展开核对"
+  },
+  {
+    "id": "q15",
+    "type": "answerable",
+    "question": "系统重启以后，之前上传的文档还需要重新处理一遍吗？",
+    "key_phrase": "无需重新上传",
+    "note": "手册 3.3：重启后自动加载"
+  },
+  {
+    "id": "q16",
+    "type": "unanswerable",
+    "question": "这个系统的会员价格是多少？有没有学生优惠？",
+    "note": "手册中没有定价信息"
+  },
+  {
+    "id": "q17",
+    "type": "unanswerable",
+    "question": "系统支持语音输入和语音朗读回答吗？",
+    "note": "手册没有语音相关能力"
+  },
+  {
+    "id": "q18",
+    "type": "unanswerable",
+    "question": "部署这套系统最少需要多少显存的 GPU？",
+    "note": "手册未涉及硬件/显存要求"
+  },
+  {
+    "id": "q19",
+    "type": "unanswerable",
+    "question": "这个系统最多支持多少个用户同时在线？",
+    "note": "手册没有并发用户数说明"
+  }
+]
