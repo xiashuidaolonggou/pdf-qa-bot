@@ -2,7 +2,7 @@
 
 基于 **RAG（检索增强生成）** 架构的智能文档问答系统。上传 PDF 或 Word 文档后，即可针对文档内容提问，回答附参考来源，可核对出处。
 
-> **在线体验**：暂未部署在线 Demo。部署到 Streamlit Cloud 后只需在 Secrets 中填一个 `GEMINI_API_KEY` 即可上线，步骤见文末「Streamlit Cloud 部署」。
+> **在线体验**：https://pdf-ask-bot.streamlit.app
 
 ---
 
