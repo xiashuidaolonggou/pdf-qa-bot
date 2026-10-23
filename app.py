@@ -89,6 +89,20 @@ if not config.GEMINI_API_KEY:
     st.error(L["no_api_key"])
     st.stop()
 
+# ===== 恢复已持久化的向量库 =====
+# Chroma 数据落在 config.VECTORSTORE_DIR，重启后应自动加载，
+# 否则界面显示“知识库为空”、同一文档会被重复入库。
+# 注意：已处理文件名列表没有落盘，重启后列表无法恢复（仅恢复向量库本身）。
+if st.session_state.vectorstore is None:
+    try:
+        if os.path.isdir(config.VECTORSTORE_DIR) and os.listdir(config.VECTORSTORE_DIR):
+            _persisted_vs = rag_engine.load_vectorstore()
+            if _persisted_vs._collection.count() > 0:
+                st.session_state.vectorstore = _persisted_vs
+    except Exception:
+        # 持久化数据损坏/不完整时不阻塞启动，退回空库状态让用户重新上传
+        st.session_state.vectorstore = None
+
 # ===== 页面标题 =====
 st.title(L["title"])
 st.caption(L["caption"])

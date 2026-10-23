@@ -1,0 +1,10 @@
+# Streamlit 配置（本地与 Streamlit Cloud 通用）
+# 密钥不要写在这里，写在 Secrets / .streamlit/secrets.toml（已 gitignore）
+
+[server]
+headless = true
+# 上传体积上限（MB），与应用“多文件上传”场景匹配
+maxUploadSize = 200
+
+[browser]
+gatherUsageStats = false

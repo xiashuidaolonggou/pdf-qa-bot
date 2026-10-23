@@ -13,6 +13,9 @@ env/
 # 环境变量（含 API Key，绝对不能上传）
 .env
 
+# Streamlit Secrets（含 API Key，绝对不能上传；.example 示例文件除外）
+.streamlit/secrets.toml
+
 # 用户上传的文档（本地临时文件）
 uploads/
 
